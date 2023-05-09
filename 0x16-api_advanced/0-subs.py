@@ -1,30 +1,32 @@
 #!/usr/bin/python3
 """
-0-subs
+Defines the number_of_subscribers function.
 """
+
 import requests
 
 
 def number_of_subscribers(subreddit):
     """
-    Queries the Reddit API and returns the number of subscribers
-    for a given subreddit.
+    Returns the number of subscribers of a given subreddit.
 
-    If the subreddit is invalid or not found, return 0.
+    Args:
+        subreddit (str): The subreddit to search.
+
+    Returns:
+        The number of subscribers (not active users) of the subreddit,
+        or 0 if the subreddit is invalid.
     """
-
-    # Set custom User-Agent header to avoid 429 error
-    headers = {'User-Agent': 'Mozilla/5.0'}
-
-    # Send HTTP GET request to Reddit API
-    url = 'https://www.reddit.com/r/{}/about.json'.format(subreddit)
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
     response = requests.get(url, headers=headers, allow_redirects=False)
 
-    # Check if the response is valid
     if response.status_code != 200:
         return 0
 
-    # Get the JSON data from the response and extract the subscriber count
-    data = response.json()
-    return data['data']['subscribers']
+    data = response.json().get("data", {})
+    subscribers = data.get("subscribers", 0)
+
+    return subscribers
+
 
