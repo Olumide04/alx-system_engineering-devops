@@ -1,22 +1,6 @@
-# Puppet manifest to fix Apache 500 error using strace
+# Fix the /var/www/html/wp-settings.php dupplicated 'p' line that rise a 500 error
 
-# Install strace package
-package { 'strace':
-  ensure => installed,
+exec { 'fix setting file':
+  provider => shell,
+  command  => 'sed -i \'s/.phpp/.php/\' /var/www/html/wp-settings.php',
 }
-
-# Run strace on Apache process
-exec { 'strace-apache':
-  command => 'strace -p $(pgrep apache2) -f -e trace=network -s 1000 -o /tmp/strace.log',
-  path    => ['/bin', '/usr/bin'],
-  creates => '/tmp/strace.log',
-}
-
-# Fix the issue with Apache
-exec { 'fix-apache':
-  command     => 'sed -i "s/Listen 80/Listen 8080/g" /etc/apache2/ports.conf && service apache2 restart',
-  path        => ['/bin', '/usr/bin'],
-  refreshonly => true,
-  subscribe   => Exec['strace-apache'],
-}
-
